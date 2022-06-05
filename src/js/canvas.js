@@ -136,7 +136,7 @@ let player = new Player()
 let platforms = []
 let genericObject = []
 
-let currentKey
+let lastKey
 const keys = {
     right: {
         pressed: false
@@ -274,18 +274,39 @@ scroll0ffset = 0
         
         // sprite switching
         if (
-            currentKey === 'right' && player.currentSprite !== 
-        player.sprites.run.right)
-         {
+            keys.right.pressed && 
+            lastKey === 'right' && player.currentSprite !== 
+        player.sprites.run.right
+        ) {
             player.frames = 1
             player.currentSprite = player.sprites.run.right
             player.currentCropWidth = player.sprites.run.cropWidth
             player.width = player.sprites.run.width
-        } else if (currentKey == 'left' && player.currentSprite !==
-        player.sprites.run.left) {
+        } else if (
+            keys.left.pressed && 
+            lastKey == 'left' && player.currentSprite !==
+        player.sprites.run.left
+        ) {
             player.currentSprite = player.sprites.run.left
                 player.currentCropWidth = player.sprites.run.cropWidth
                 player.width = player.sprites.run.width
+        } else if (
+            !keys.left.pressed && 
+            lastKey == 'left' && player.currentSprite !==
+        player.sprites.stand.left
+        ) {
+            player.currentSprite = player.sprites.stand.left
+                player.currentCropWidth = player.sprites.stand.cropWidth
+                player.width = player.sprites.stand.width
+        }
+        else if (
+            !keys.right.pressed && 
+            lastKey == 'right' && player.currentSprite !==
+        player.sprites.stand.right
+        ) {
+            player.currentSprite = player.sprites.stand.right
+                player.currentCropWidth = player.sprites.stand.cropWidth
+                player.width = player.sprites.stand.width
         }
  
         //win condition
@@ -309,7 +330,7 @@ scroll0ffset = 0
             case 65:
                 console.log('left')
                 keys.left.pressed = true
-                currentKey = 'left'
+                lastKey = 'left'
                 break
             case 83:
                 console.log('down')
@@ -317,7 +338,7 @@ scroll0ffset = 0
             case 68:
                 console.log('right')
                 keys.right.pressed = true
-                currentKey = 'right'
+                lastKey = 'right'
                 break
             case 87:
                 console.log('up')
