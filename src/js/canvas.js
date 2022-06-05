@@ -1,4 +1,7 @@
 import platform from '../img/platform.png'
+import hills from '../img/hills.png'
+import background from '../img/background.png'
+import platformSmallTall from '../img/platformSmallTall.png'
 
 console.log(platform)
 const canvas = document.querySelector('canvas')
@@ -11,6 +14,7 @@ canvas.height = 576
 const gravity = 0.5
 class Player {
     constructor(){
+        this.speed = 10
         this.position = {
             x: 100,
             y: 100
@@ -39,8 +43,6 @@ class Player {
 
         if(this.position.y + this.height + this.velocity.y <= canvas.height)
         this.velocity.y += gravity
-        else 
-        this.velocity.y = 0
     }
 }
 
@@ -61,21 +63,35 @@ class Platform {
     }
 }
 
-const image = new Image()
-image.src = platform
+class GenericObject {
+    constructor({ x, y, image }) {
+        this.position = {
+            x,
+            y
+        }
 
-console.log(image)
+        this.image = image
+        this.width = image.width
+        this.height = image.height
+    }
 
-const player = new Player()
-const platforms = [
-  new Platform({
-    x: -1,
-    y: 470,
-    image
-  }), 
-  new Platform({ x: image.width - 2, y: 470, image }
-    )
-  ]
+    draw() {
+        c.drawImage(this.image, this.position.x, this.position.y)
+    }
+}
+
+function createImage(imageSrc) {
+    const image = new Image()
+    image.src = imageSrc
+    return image
+}
+
+let platformImage = createImage(platform)
+let platformSmallTallImage = createImage(platformSmallTall)
+
+let player = new Player()
+let platforms = []
+let genericObject = []
 
 const keys = {
     right: {
@@ -88,11 +104,76 @@ const keys = {
 
 let scroll0ffset = 0
 
+function init() {
+
+platformImage = createImage(platform)
+
+player = new Player()
+platforms = [
+    new Platform({ 
+        x: platformImage.width * 4 + 300 - 2 + platformImage.width - 
+        platformSmallTallImage.width, 
+        y: 270, 
+        image: createImage(platformSmallTall) }
+                    ),
+    new Platform({
+    x: -1,
+    y: 470,
+    image: platformImage
+    }), 
+    new Platform({ 
+      x: platformImage.width - 3, 
+      y: 470, 
+      image: platformImage }
+    ),
+    new Platform({ 
+        x: platformImage.width * 2 + 100, 
+        y: 470, 
+        image: platformImage }
+        ),
+    new Platform({ 
+    x: platformImage.width * 3 + 300, 
+    y: 470, 
+    image: platformImage }
+    ),
+    new Platform({ 
+    x: platformImage.width * 4 + 300 - 2, 
+    y: 470, 
+    image: platformImage 
+    }),
+    new Platform({ 
+        x: platformImage.width * 5 + 600 - 2, 
+        y: 470, 
+        image: platformImage 
+        })
+    
+]
+genericObject = [
+    new GenericObject ({
+        x: -1,
+        y: -1,
+        image: createImage(background)
+  }),
+  new GenericObject ({
+    x: -1,
+    y: -1,
+    image: createImage(hills)
+})
+]
+
+scroll0ffset = 0
+
+}
+
     function animate() {
         requestAnimationFrame(animate)
         c.fillStyle = 'white'
         c.fillRect(0, 0, canvas.width, canvas.height)
-        
+       
+        genericObject.forEach(genericObject => {
+            genericObject.draw()
+        })
+
         platforms.forEach((platform) => {
             platform.draw()
         })
@@ -100,22 +181,31 @@ let scroll0ffset = 0
         
 
         if (keys.right.pressed && player.position.x < 400) {
-            player.velocity.x = 5
-        } else if (keys.left.pressed && player.position.x > 100) {
-            player.velocity.x = -5
+            player.velocity.x = player.speed
+        } else if ((keys.left.pressed && player.position.x > 100) || 
+            keys.left.pressed && scroll0ffset === 0 && 
+            player.position.x > 0) {
+            player.velocity.x = -player.speed
         } else { 
             player.velocity.x = 0
 
             if(keys.right.pressed) {
-                scroll0ffset += 5
+                scroll0ffset += player.speed
                 platforms.forEach(platform => {
-                    platform.position.x -= 5;
+                    platform.position.x -= player.speed;
                 })
-            } else if (keys.left. pressed) {
-                scroll0ffset -= 5
+                genericObject.forEach(genericObject => {
+                    genericObject.position.x -= player.speed * .66
+                })
+            } else if (keys.left. pressed && scroll0ffset > 0) {
+                scroll0ffset -= player.speed
 
                 platforms.forEach(platform => {
-                    platform.position.x += 5;
+                    platform.position.x += player.speed;
+                })
+
+                genericObject.forEach(genericObject => {
+                    genericObject.position.x += player.speed * .66
                 })
             }
         }
@@ -125,26 +215,36 @@ let scroll0ffset = 0
         platforms.forEach(platform => {
         if (
             player.position.y + player.height <= platform.position.y 
+
             && player.position.y + player.height + player.velocity.y 
+
             >= platform.position.y && player.position.x + player.width 
+
             >= platform.position.x && player.position.x 
+
             <= platform.position.x + platform.width
             ) {
             player.velocity.y = 0
         }
         })
-
-        if(scroll0ffset > 2000) {
+ 
+        //win condition
+        if(scroll0ffset > platformImage.width * 5 + 300 - 2) {
             console.log('You win')
-
         }
-        
+
+        //lose condition
+        if (player.position.y > canvas.height) {
+            init()
+        }
+    
     }
 
+    init()
     animate()
 
     addEventListener('keydown', ({ keyCode }) => {
-        console.log( keyCode )
+        //console.log( keyCode )
         switch (keyCode){
             case 65:
                 console.log('left')
@@ -159,7 +259,7 @@ let scroll0ffset = 0
                 break
             case 87:
                 console.log('up')
-                player.velocity.y -= 20
+                player.velocity.y -= 15
                 break
         }
         
@@ -169,7 +269,7 @@ let scroll0ffset = 0
     
 
     addEventListener('keyup', ({ keyCode }) => {
-        console.log( keyCode )
+        //console.log( keyCode )
         switch (keyCode){
             case 65:
                 console.log('left')
