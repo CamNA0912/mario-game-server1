@@ -36,13 +36,29 @@ class Player {
 
         this.image = createImage(spriteStandRight)
         this.frames = 0
+        this.sprites = {
+            stand: {
+                right: createImage(spriteStandRight), 
+                cropWidth: 177, 
+                width: 66
+            },
+            run: {
+                right: createImage(spriteRunRight), 
+                cropWidth: 340, 
+                width: 127.875
+            }
+        }
+
+        this.currentSprite = this.sprites.stand.right
+        this.currentCropWidth = 177
     }
+
     draw() {
         c.drawImage(
-            this.image, 
-            177 * this.frames, 
+            this.currentSprite, 
+            this.currentCropWidth * this.frames, 
             0,
-            177, 
+            this.currentCropWidth, 
             400,
             this.position.x, 
             this.position.y, 
@@ -75,7 +91,9 @@ class Platform {
     }
 
     draw() {
-        c.drawImage(this.image, this.position.x, this.position.y)
+        c.drawImage(this.image, 
+            this.position.x, 
+            this.position.y)
     }
 }
 
@@ -272,6 +290,9 @@ scroll0ffset = 0
             case 68:
                 console.log('right')
                 keys.right.pressed = true
+                player.currentSprite = player.sprites.run.right
+                player.currentCropWidth = player.sprites.run.cropWidth
+                player.width = player.sprites.run.width
                 break
             case 87:
                 console.log('up')
