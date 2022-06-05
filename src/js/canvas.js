@@ -3,6 +3,12 @@ import hills from '../img/hills.png'
 import background from '../img/background.png'
 import platformSmallTall from '../img/platformSmallTall.png'
 
+import spriteRunLeft from '../img/spriteRunLeft.png'
+import spriteRunRight from '../img/spriteRunRight.png'
+import spriteStandLeft from '../img/spriteStandLeft.png'
+import spriteStandRight from '../img/spriteStandRight.png'
+
+
 console.log(platform)
 const canvas = document.querySelector('canvas')
 
@@ -25,18 +31,28 @@ class Player {
             y: 1
         }
 
-        this.width = 30
-        this.height = 30
+        this.width = 66
+        this.height = 150
+
+        this.image = createImage(spriteStandRight)
+        this.frames = 0
     }
     draw() {
-        c.fillStyle = 'blue'
-        c.fillRect(this.position.x, this.
-            position.y, this.width, this.height
-            )
+        c.drawImage(
+            this.image, 
+            177 * this.frames, 
+            0,
+            177, 
+            400,
+            this.position.x, 
+            this.position.y, 
+            this.width, 
+            this.height)
     }
 
     update() {
-        
+        this.frames++
+        if (this.frames > 28) this.frames = 0
         this.draw()
         this.position.x += this.velocity.x
         this.position.y += this.velocity.y
@@ -167,7 +183,7 @@ scroll0ffset = 0
 
     function animate() {
         requestAnimationFrame(animate)
-        c.fillStyle = 'white'
+        c.fillStyle = 'black'
         c.fillRect(0, 0, canvas.width, canvas.height)
        
         genericObject.forEach(genericObject => {
