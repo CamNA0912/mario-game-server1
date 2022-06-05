@@ -28,7 +28,7 @@ class Player {
 
         this.velocity = {
             x: 0,
-            y: 1
+            y: 0
         }
 
         this.width = 66
@@ -44,7 +44,7 @@ class Player {
             },
             run: {
                 right: createImage(spriteRunRight), 
-                cropWidth: 340, 
+                cropWidth: 341, 
                 width: 127.875
             }
         }
@@ -68,7 +68,12 @@ class Player {
 
     update() {
         this.frames++
-        if (this.frames > 28) this.frames = 0
+        if (this.frames > 59 && this.currentSprite === this.
+            sprites.stand.right) 
+            this.frames = 0
+        else if (this.frames > 29 && this.currentSprite === this.
+            sprites.run.right) 
+            this.frames = 0
         this.draw()
         this.position.x += this.velocity.x
         this.position.y += this.velocity.y
